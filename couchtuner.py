@@ -1,3 +1,4 @@
+import os
 import sys
 import traceback
 import requests
@@ -10,7 +11,8 @@ import youtube_dl
 # 'video' page
 # http://video247.xyz/madam-secretary-s4e2-off-the-record/
 
-blacklist = ['vidup.me']
+blacklist = ['vidup.me', 'thevideo.me']
+# whitelist = ['vshare.eu', 'openload.co']
 
 if __name__ == "__main__":
 
@@ -27,16 +29,17 @@ if __name__ == "__main__":
 
 	# parse video page
 	doc = lxml.html.fromstring(response.content)
+	folder = doc.cssselect('h2.postSingle')[0].text.strip().replace(' ', '_')
+	os.makedirs(folder, exist_ok=True)
 	iframes = doc.cssselect('.postTabs_divs iframe')
 	iframe_urls = [iframe.get('src') for iframe in iframes
 					if not any(domain in iframe.get('src') for domain in blacklist)]
-	with youtube_dl.YoutubeDL({}) as ydl:
+	with youtube_dl.YoutubeDL({'outtmpl': folder + '/%(title)s-%(id)s.%(ext)s'}) as ydl:
 		for url in iframe_urls:
-			print(f'attempting to download {url}')
+			print(f'attempting to download {url} to {folder}')
 			try:
 				ydl.download([url])
 			except Exception as e:
-				traceback.print_exc()
 				continue
 			else:
 				break
