@@ -4,11 +4,11 @@
 
 ```
 npm install -g phantomjs-prebuilt
-pip install youtube-dl
+pipenv install
 ```
 
 ### Usage
 
 ```
-python couchtuner.py <url>
+pipenv run python couchtuner.py <url>
 ```
