@@ -1,5 +1,8 @@
+#!/usr/bin/env python
+
 import os
 import sys
+import shutil
 import traceback
 import requests
 import lxml.html
@@ -11,7 +14,7 @@ import youtube_dl
 # 'video' page
 # http://video247.xyz/madam-secretary-s4e2-off-the-record/
 
-blacklist = ['vidup.me', 'thevideo.me']
+blacklist = ['vidup.me', 'thevideo.me', 'openload.co']
 # whitelist = ['vshare.eu', 'openload.co']
 
 if __name__ == "__main__":
@@ -20,9 +23,14 @@ if __name__ == "__main__":
         print("Usage: python couchtuner.py <url>")
         sys.exit(1)
 
+    if not shutil.which('phantomjs'):
+        print('phantomjs not found in PATH. try installing via:\n\t'
+              'npm install -g phantomjs-prebuilt')
+        sys.exit(1)
+
     url = sys.argv[1]
     response = requests.get(url)
-    if "Watch It Here :" in response.text:
+    if "Watch it here" in response.text:
         doc = lxml.html.fromstring(response.content)
         url = doc.cssselect("a[rel='bookmark']")[0].get('href')
         response = requests.get(url)
